@@ -183,14 +183,25 @@
     box-shadow:0 4px 14px -4px rgba(34,211,238,0.6);
   }
   .nav-cta{
-    background:rgba(34,211,238,0.16);
-    border:1px solid rgba(34,211,238,0.5);
-    color:#EAFCFF;font-weight:700;font-size:14px;
-    padding:10px 18px;border-radius:10px;text-decoration:none;
+    background:linear-gradient(135deg, rgba(34,211,238,0.95), rgba(139,124,246,0.85));
+    border:1px solid rgba(255,255,255,0.35);
+    color:#04222A;font-weight:700;font-size:14px;
+    padding:11px 20px;border-radius:10px;text-decoration:none;
     white-space:nowrap;
+    display:inline-flex;align-items:center;gap:7px;
+    box-shadow:0 10px 24px -10px rgba(34,211,238,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
     -webkit-backdrop-filter:blur(10px);
     backdrop-filter:blur(10px);
+    transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
   }
+  .nav-cta:hover{
+    transform:translateY(-2px) scale(1.03);
+    box-shadow:0 14px 30px -10px rgba(34,211,238,0.75), inset 0 1px 0 rgba(255,255,255,0.5);
+    filter:brightness(1.07);
+  }
+  .nav-cta:active{transform:translateY(0) scale(0.98);}
+  .nav-cta .arrow{transition:transform .2s ease;}
+  .nav-cta:hover .arrow{transform:translateX(3px);}
 
   /* ---------- language chooser popup ---------- */
   .lang-overlay{
@@ -275,14 +286,58 @@
   .hero p.lead{font-size:19px;color:var(--muted);max-width:520px;margin:0 0 30px;text-shadow:0 1px 12px rgba(0,0,0,0.4);}
   .cta-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
   .btn-primary{
-    background:linear-gradient(135deg, rgba(34,211,238,0.9), rgba(56,207,255,0.85));
+    background:linear-gradient(135deg, rgba(34,211,238,0.95), rgba(139,124,246,0.9));
+    background-size:160% 160%;
     color:#04222A;font-weight:700;font-size:16px;
-    padding:16px 30px;border-radius:13px;text-decoration:none;
-    border:1px solid rgba(255,255,255,0.35);
+    padding:17px 34px;border-radius:13px;text-decoration:none;
+    border:1px solid rgba(255,255,255,0.4);
     box-shadow:0 16px 34px -14px rgba(34,211,238,0.6), inset 0 1px 0 rgba(255,255,255,0.5);
     -webkit-backdrop-filter:blur(6px);
     backdrop-filter:blur(6px);
+    display:inline-flex;align-items:center;gap:9px;
+    position:relative;
+    letter-spacing:0.2px;
+    transition:transform .22s ease, box-shadow .22s ease, background-position .4s ease, filter .22s ease;
+    animation:ctaPulse 2.6s ease-in-out infinite;
   }
+  .btn-primary .arrow{transition:transform .22s ease;}
+  .btn-primary:hover{
+    transform:translateY(-3px) scale(1.035);
+    box-shadow:0 22px 44px -14px rgba(34,211,238,0.85), inset 0 1px 0 rgba(255,255,255,0.6);
+    background-position:100% 50%;
+    filter:brightness(1.08);
+    animation-play-state:paused;
+  }
+  .btn-primary:hover .arrow{transform:translateX(4px);}
+  .btn-primary:active{transform:translateY(-1px) scale(0.98);}
+  @keyframes ctaPulse{
+    0%,100%{box-shadow:0 16px 34px -14px rgba(34,211,238,0.6), inset 0 1px 0 rgba(255,255,255,0.5);}
+    50%{box-shadow:0 18px 40px -12px rgba(139,124,246,0.75), inset 0 1px 0 rgba(255,255,255,0.5);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .btn-primary{animation:none;}
+  }
+  .btn-secondary{
+    background:rgba(255,255,255,0.06);
+    color:var(--text);font-weight:700;font-size:16px;
+    padding:16px 30px;border-radius:13px;text-decoration:none;
+    border:1.5px solid var(--glass-border-strong);
+    display:inline-flex;align-items:center;gap:9px;
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+    transition:transform .22s ease, background .22s ease, border-color .22s ease;
+  }
+  .btn-secondary .play{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:20px;height:20px;border-radius:50%;
+    background:var(--teal);color:#04222A;font-size:10px;flex-shrink:0;
+  }
+  .btn-secondary:hover{
+    background:rgba(255,255,255,0.12);
+    border-color:var(--teal);
+    transform:translateY(-2px);
+  }
+  .btn-secondary:active{transform:translateY(0);}
   .price-note{color:var(--muted);font-size:14px;}
   .price-note strong{color:var(--text);}
   .hero-art{padding:14px;}
@@ -490,7 +545,7 @@
       <img src="images/logo.png" alt="DebtFree logo" class="brand-mark">
       DebtFree
     </div>
-    <a href="#pricing" class="nav-cta" data-i18n="nav_cta">Get it — $47</a>
+    <a href="https://payhip.com/buy?s=1&qty%5BTZnWx%5D=1&cart_links%5B%5D=TZnWx" target="_blank" rel="noopener" class="nav-cta"><span data-i18n="nav_cta">Get it — $47</span><span class="arrow">→</span></a>
   </div>
 </header>
 
@@ -514,7 +569,8 @@
       <h1 data-i18n="hero_h1">Stop guessing which debt to pay first.</h1>
       <p class="lead" data-i18n="hero_lead">DebtFree turns your credit cards, loans, and balances into one clear payoff plan — so every dollar you send goes where it actually saves you money.</p>
       <div class="cta-row">
-        <a href="#pricing" class="btn-primary" data-i18n="hero_cta">Get DebtFree — $47</a>
+        <a href="https://payhip.com/buy?s=1&qty%5BTZnWx%5D=1&cart_links%5B%5D=TZnWx" target="_blank" rel="noopener" class="btn-primary"><span data-i18n="hero_cta">Get DebtFree — $47</span><span class="arrow">→</span></a>
+        <a href="https://salesdebtfree-app.github.io/DEMO/" target="_blank" rel="noopener" class="btn-secondary"><span class="play">▶</span><span data-i18n="hero_demo_cta">Try the live demo</span></a>
         <span class="price-note" data-i18n-html="hero_price_note">One-time payment. <strong>Yours forever.</strong></span>
       </div>
     </div>
@@ -713,7 +769,7 @@
           <li><span class="tick">✓</span><span data-i18n="price_li5">Works forever — no login, no cloud, no expiry</span></li>
         </ul>
         <div>
-          <a href="#" class="btn-primary" data-i18n="price_cta">Get DebtFree Now — $47</a>
+          <a href="https://payhip.com/buy?s=1&qty%5BTZnWx%5D=1&cart_links%5B%5D=TZnWx" target="_blank" rel="noopener" class="btn-primary"><span data-i18n="price_cta">Get DebtFree Now — $47</span><span class="arrow">→</span></a>
         </div>
       </div>
       <div class="reveal-curtain"></div>
@@ -765,6 +821,7 @@
     hero_h1: { en: 'Stop guessing which debt to pay first.', es: 'Deja de adivinar qué deuda pagar primero.' },
     hero_lead: { en: "DebtFree turns your credit cards, loans, and balances into one clear payoff plan — so every dollar you send goes where it actually saves you money.", es: 'DebtFree convierte tus tarjetas de crédito, préstamos y saldos en un plan de pago claro, para que cada peso que envíes vaya justo donde más te conviene.' },
     hero_cta: { en: 'Get DebtFree — $47', es: 'Obtén DebtFree — $47' },
+    hero_demo_cta: { en: 'Try the live demo', es: 'Prueba la demo en vivo' },
     hero_price_note: { en: 'One-time payment. <strong>Yours forever.</strong>', es: 'Pago único. <strong>Tuyo para siempre.</strong>' },
 
     stat1_num: { en: '1 file', es: '1 archivo' },
