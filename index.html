@@ -449,6 +449,7 @@
     .nav-cta{padding:9px 14px;font-size:13px;}
   }
 </style>
+<script src="https://www.paypal.com/sdk/js?client-id=BAAx7p2_ao1T_AUMC6oRCoxgkOADcfgu0zp0hwT__IZGXCnuiY5e7KAVntS9EBUxNs05ZAh671wzhqOuf4&currency=USD&components=buttons"></script>
 </head>
 <body>
 
@@ -545,7 +546,7 @@
       <img src="images/logo.png" alt="DebtFree logo" class="brand-mark">
       DebtFree
     </div>
-    <a href="https://payhip.com/buy?s=1&qty%5BTZnWx%5D=1&cart_links%5B%5D=TZnWx" target="_blank" rel="noopener" class="nav-cta"><span data-i18n="nav_cta">Get it — $47</span><span class="arrow">→</span></a>
+    <a href="#pricing" class="nav-cta"><span data-i18n="nav_cta">Get it — $47</span><span class="arrow">→</span></a>
   </div>
 </header>
 
@@ -569,7 +570,7 @@
       <h1 data-i18n="hero_h1">Stop guessing which debt to pay first.</h1>
       <p class="lead" data-i18n="hero_lead">DebtFree turns your credit cards, loans, and balances into one clear payoff plan — so every dollar you send goes where it actually saves you money.</p>
       <div class="cta-row">
-        <a href="https://payhip.com/buy?s=1&qty%5BTZnWx%5D=1&cart_links%5B%5D=TZnWx" target="_blank" rel="noopener" class="btn-primary"><span data-i18n="hero_cta">Get DebtFree — $47</span><span class="arrow">→</span></a>
+        <a href="#pricing" class="btn-primary"><span data-i18n="hero_cta">Get DebtFree — $47</span><span class="arrow">→</span></a>
         <a href="https://salesdebtfree-app.github.io/DEMO/" target="_blank" rel="noopener" class="btn-secondary"><span class="play">▶</span><span data-i18n="hero_demo_cta">Try the live demo</span></a>
         <span class="price-note" data-i18n-html="hero_price_note">One-time payment. <strong>Yours forever.</strong></span>
       </div>
@@ -768,8 +769,18 @@
           <li><span class="tick">✓</span><span data-i18n="price_li4">PDF and Excel export, unlimited</span></li>
           <li><span class="tick">✓</span><span data-i18n="price_li5">Works forever — no login, no cloud, no expiry</span></li>
         </ul>
-        <div>
-          <a href="https://payhip.com/buy?s=1&qty%5BTZnWx%5D=1&cart_links%5B%5D=TZnWx" target="_blank" rel="noopener" class="btn-primary"><span data-i18n="price_cta">Get DebtFree Now — $47</span><span class="arrow">→</span></a>
+        <div id="discount-block" style="max-width:340px;margin:0 auto 22px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="discount-code-input" placeholder="Discount code" autocomplete="off"
+              style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.04);color:var(--text);font-size:14px;font-family:inherit;">
+            <button type="button" id="discount-apply-btn"
+              style="padding:12px 18px;border-radius:10px;border:1px solid var(--glass-border-strong);background:rgba(255,255,255,0.06);color:var(--text);font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap;">Apply</button>
+          </div>
+          <p id="discount-msg" style="display:none;font-size:13px;margin:10px 0 0;text-align:center;"></p>
+        </div>
+        <div id="paypal-purchase-block">
+          <div id="paypal-button-container"></div>
+          <p id="paypal-status-msg" style="display:none;color:var(--muted);font-size:14px;margin-top:14px;text-align:center;"></p>
         </div>
       </div>
       <div class="reveal-curtain"></div>
@@ -931,6 +942,116 @@
   // todos los elementos quedan visibles desde el inicio.
   var els = document.querySelectorAll('.reveal, .reveal-mask');
   els.forEach(function(el){ el.classList.add('visible'); });
+})();
+</script>
+
+<script>
+(function(){
+  var POWER_AUTOMATE_URL = 'https://default1e6771aa566b446dad40c3c5173be0.dd.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/d94869533aa4479a82f6862d17b04a85/triggers/manual/paths/invoke?api-version=1';
+
+  if (typeof paypal === 'undefined') {
+    console.error('El SDK de PayPal no cargó. Revisa el Client ID o el bloqueo de scripts (ad-blockers).');
+    return;
+  }
+
+  var statusMsg = document.getElementById('paypal-status-msg');
+
+  function showStatus(text){
+    if(!statusMsg) return;
+    statusMsg.style.display = 'block';
+    statusMsg.textContent = text;
+  }
+
+  // --- Discount code handling ---
+  // NOTE: this runs entirely in the browser, so it's only meant for
+  // internal / sandbox testing — anyone viewing the page source can see
+  // the code. Do not rely on this for a real production discount.
+  var VALID_DISCOUNT_CODE = 'TEST01';
+  var FULL_PRICE = '47.00';
+  var DISCOUNT_PRICE = '0.01';
+  var currentAmount = FULL_PRICE;
+
+  var discountInput = document.getElementById('discount-code-input');
+  var discountBtn   = document.getElementById('discount-apply-btn');
+  var discountMsg   = document.getElementById('discount-msg');
+  var priceTag      = document.querySelector('.price-tag');
+
+  function showDiscountMsg(text, ok){
+    if(!discountMsg) return;
+    discountMsg.style.display = 'block';
+    discountMsg.style.color = ok ? '#34D399' : '#F0506E';
+    discountMsg.textContent = text;
+  }
+
+  function updatePriceDisplay(){
+    if(!priceTag) return;
+    var suffixSpan = priceTag.querySelector('span');
+    var suffixHTML = suffixSpan ? suffixSpan.outerHTML : '';
+    priceTag.innerHTML = '$' + (currentAmount === FULL_PRICE ? '47' : currentAmount) + suffixHTML;
+  }
+
+  if (discountBtn) {
+    discountBtn.addEventListener('click', function(){
+      var entered = (discountInput.value || '').trim().toUpperCase();
+      if (entered === VALID_DISCOUNT_CODE) {
+        currentAmount = DISCOUNT_PRICE;
+        updatePriceDisplay();
+        showDiscountMsg('Discount applied — new total: $' + DISCOUNT_PRICE, true);
+        discountInput.disabled = true;
+        discountBtn.disabled = true;
+        discountBtn.style.opacity = '0.6';
+        discountBtn.style.cursor = 'default';
+      } else {
+        showDiscountMsg('Invalid discount code.', false);
+      }
+    });
+  }
+
+  paypal.Buttons({
+    style: {
+      layout: 'vertical',
+      color:  'gold',
+      shape:  'rect',
+      label:  'paypal'
+    },
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          description: 'DebtFree — Full access (one-time payment)',
+          amount: { value: currentAmount, currency_code: 'USD' }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details){
+        var email   = (details.payer && details.payer.email_address) || '';
+        var orderID = data.orderID;
+
+        showStatus('Payment received. Confirming and preparing your file…');
+
+        fetch(POWER_AUTOMATE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderID: orderID, email: email })
+        })
+        .then(function(res){
+          if(!res.ok){ throw new Error('Power Automate respondió con estado ' + res.status); }
+          showStatus('Thank you! Check your inbox — we are sending your file to ' + email + '.');
+        })
+        .catch(function(err){
+          console.error('Error notifying Power Automate:', err);
+          showStatus('Payment confirmed, but we had trouble triggering delivery. Contact support with your Order ID: ' + orderID);
+        });
+      });
+    },
+    onError: function(err){
+      console.error('PayPal error:', err);
+      showStatus('Something went wrong with the payment. Please try again or use another method.');
+    },
+    onCancel: function(){
+      showStatus('Payment cancelled. You can try again whenever you are ready.');
+    }
+  }).render('#paypal-button-container');
 })();
 </script>
 
